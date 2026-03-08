@@ -2,6 +2,8 @@ package com.example.couponSystem.service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -43,9 +45,18 @@ public class CouponService {
         userRepository.save(user);
 
         return "ISSUED";
-
-        
     }
 
+    @Transactional
+    public void createTestCoupons(int amount){
+        List<Coupon> coupons = IntStream.range(0, amount)
+                .mapToObj(i -> {
+                    Coupon coupon = new Coupon();
+                    coupon.setState(CouponState.NEW);
+                    return coupon;
+                })
+                .collect(Collectors.toList());
 
+        couponRepository.saveAll(coupons);
+    }
 }
