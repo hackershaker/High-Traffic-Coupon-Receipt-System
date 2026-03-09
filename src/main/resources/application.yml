@@ -1,27 +1,19 @@
 spring:
-    application:
-        name: couponSystem
+  profiles:
+    active: dev # 현재 활성화할 프로필
 
-    h2:
-        console:
-            enabled: true      # 웹 브라우저에서 DB 관리 도구 사용 여부
-            path: /h2-console  # 접속 경로 (기본값: /h2-console)
+---
+spring:
+  config:
+    activate:
+      on-profile: dev
+server:
+  port: 8080 # 개발 환경 포트
 
-    datasource:
-        driver-class-name: org.h2.Driver
-        # 메모리 모드: 서버 종료 시 데이터 초기화
-        url: jdbc:h2:mem:testdb
-        # 파일 모드: 사용자 홈 디렉토리에 데이터 저장 (비휘발성)
-        # url: jdbc:h2:file:~/testdb 
-        username: sa
-        password: 
-
-    jpa:
-        hibernate:
-            ddl-auto: update
-        show-sql: true
-        properties:
-            hibernate:
-                format_sql: true
-                # H2 2.1.210 버전 이상 사용 시 dialect 명시가 필요할 수 있음
-                dialect: org.hibernate.dialect.H2Dialect
+---
+spring:
+  config:
+    activate:
+      on-profile: prod
+server:
+  port: 80 # 운영 환경 포트
