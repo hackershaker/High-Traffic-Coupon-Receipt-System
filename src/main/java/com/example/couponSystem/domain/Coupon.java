@@ -22,5 +22,5 @@ public class Coupon {
     private CouponState state;
 
     @ManyToOne
-    private User user;
+    private Member member;
 }
