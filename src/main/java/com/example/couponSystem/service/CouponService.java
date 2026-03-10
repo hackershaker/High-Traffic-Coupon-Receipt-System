@@ -10,7 +10,7 @@ import org.springframework.stereotype.Service;
 
 import com.example.couponSystem.domain.Coupon;
 import com.example.couponSystem.domain.CouponState;
-import com.example.couponSystem.domain.User;
+import com.example.couponSystem.domain.Member;
 import com.example.couponSystem.repository.CouponRepository;
 import com.example.couponSystem.repository.UserRepository;
 
@@ -25,11 +25,11 @@ public class CouponService {
     private UserRepository userRepository;
 
     @Transactional
-    public String CouponIssuance(Long userId){
-        User user = userRepository.getReferenceById(userId);
+    public String CouponIssuance(Long userId) {
+        Member user = userRepository.getReferenceById(userId);
 
         Optional<Coupon> coupon = couponRepository.findFirstByState(CouponState.NEW);
-        if(coupon.isEmpty()){
+        if (coupon.isEmpty()) {
             return "EMPTY";
         }
 
@@ -40,7 +40,7 @@ public class CouponService {
         couponList.add(registedCoupon);
 
         user.setCouponList(couponList);
-        
+
         couponRepository.save(registedCoupon);
         userRepository.save(user);
 
@@ -48,7 +48,7 @@ public class CouponService {
     }
 
     @Transactional
-    public void createTestCoupons(int amount){
+    public void createTestCoupons(int amount) {
         List<Coupon> coupons = IntStream.range(0, amount)
                 .mapToObj(i -> {
                     Coupon coupon = new Coupon();
