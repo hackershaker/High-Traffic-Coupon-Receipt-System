@@ -48,6 +48,17 @@ public class CouponService {
     }
 
     @Transactional
+    public void ensureTestCoupons(int targetCount) {
+        long existing = couponRepository.count();
+        if (existing >= targetCount) {
+            return;
+        }
+
+        int delta = (int) (targetCount - existing);
+        createTestCoupons(delta);
+    }
+
+    @Transactional
     public void createTestCoupons(int amount) {
         List<Coupon> coupons = IntStream.range(0, amount)
                 .mapToObj(i -> {
