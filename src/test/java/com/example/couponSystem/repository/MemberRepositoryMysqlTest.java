@@ -8,9 +8,9 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.transaction.annotation.Transactional;
-import org.testcontainers.containers.MySQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
+import org.testcontainers.mysql.MySQLContainer;
 import org.testcontainers.utility.DockerImageName;
 
 import com.example.couponSystem.domain.Member;
@@ -21,7 +21,7 @@ import com.example.couponSystem.domain.Member;
 class MemberRepositoryMysqlTest {
 
     @Container
-    static final MySQLContainer<?> mysql = new MySQLContainer<>(DockerImageName.parse("mysql:8.0.45"))
+    static final MySQLContainer mysql = new MySQLContainer(DockerImageName.parse("mysql:8.0.45"))
             .withDatabaseName("coupon_test")
             .withUsername("test")
             .withPassword("test");
