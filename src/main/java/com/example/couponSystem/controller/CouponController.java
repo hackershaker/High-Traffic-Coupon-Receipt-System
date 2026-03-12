@@ -3,32 +3,39 @@ package com.example.couponSystem.controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.couponSystem.dto.CouponRequest;
 import com.example.couponSystem.dto.CouponResponse;
 import com.example.couponSystem.service.CouponService;
 
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-
-
-
 @RestController
 public class CouponController {
-    
+
     @Autowired
     private CouponService couponService;
 
     @PostMapping("/coupon")
-    public ResponseEntity<CouponResponse> RegisterCoupon(@RequestBody CouponRequest request) {
-
+    public ResponseEntity<CouponResponse> registerCoupon(@RequestBody CouponRequest request) {
         String result = couponService.CouponIssuance(request.getUserId());
-        
+
         CouponResponse response = new CouponResponse();
         response.setResult(result);
 
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
-    
+
+    @PostMapping("/coupon/me")
+    public ResponseEntity<CouponResponse> registerForCurrentUser(@AuthenticationPrincipal UserDetails userDetails) {
+        String result = couponService.issueCouponForUsername(userDetails.getUsername());
+
+        CouponResponse response = new CouponResponse();
+        response.setResult(result);
+
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
 }
