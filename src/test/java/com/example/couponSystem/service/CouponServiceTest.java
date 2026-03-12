@@ -29,4 +29,17 @@ class CouponServiceTest {
         couponService.createTestCoupons(5);
         assertEquals(105, couponRepository.count());
     }
+
+    @Test
+    @Transactional
+    void ensureTestCoupons_addsOnlyMissingAmount() {
+        couponRepository.deleteAll();
+
+        couponService.createTestCoupons(2);
+        couponService.ensureTestCoupons(5);
+        assertEquals(5, couponRepository.count());
+
+        couponService.ensureTestCoupons(5);
+        assertEquals(5, couponRepository.count());
+    }
 }
