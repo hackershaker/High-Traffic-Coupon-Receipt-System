@@ -48,6 +48,13 @@ public class CouponService {
     }
 
     @Transactional
+    public String issueCouponForUsername(String username) {
+        Member user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new IllegalArgumentException("User not found: " + username));
+        return CouponIssuance(user.getId());
+    }
+
+    @Transactional
     public void ensureTestCoupons(int targetCount) {
         long existing = couponRepository.count();
         if (existing >= targetCount) {
