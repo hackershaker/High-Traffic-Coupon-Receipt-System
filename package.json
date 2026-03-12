@@ -1,0 +1,25 @@
+{
+  "name": "high_traffic_coupon_receipt_system",
+  "version": "1.0.0",
+  "description": "> **\"대규모 동시 요청 환경에서 정확하고 빠른 선착순 쿠폰 발급 시스템 구축\"**",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hackershaker/High-Traffic-Coupon-Receipt-System.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/hackershaker/High-Traffic-Coupon-Receipt-System/issues"
+  },
+  "homepage": "https://github.com/hackershaker/High-Traffic-Coupon-Receipt-System#readme",
+  "devDependencies": {
+    "@types/k6": "^1.6.0",
+    "typescript": "^5.9.3"
+  }
+}
