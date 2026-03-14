@@ -27,7 +27,7 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http, AuthenticationProvider authenticationProvider)
             throws Exception {
         http
-                .csrf(csrf -> csrf.ignoringRequestMatchers("/login", "/logout", "/coupon", "/coupon/me"))
+                .csrf(csrf -> csrf.ignoringRequestMatchers("/login", "/logout", "/coupon/me"))
                 .authenticationProvider(authenticationProvider)
                 .authorizeHttpRequests(authorize -> authorize
                         .dispatcherTypeMatchers(DispatcherType.FORWARD, DispatcherType.ERROR).permitAll()
