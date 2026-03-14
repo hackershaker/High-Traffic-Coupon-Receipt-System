@@ -6,6 +6,7 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import lombok.Getter;
 import lombok.Setter;
@@ -21,6 +22,7 @@ public class Coupon {
     @Enumerated(EnumType.STRING)
     private CouponState state;
 
-    @ManyToOne
+    @ManyToOne(optional = true) // member가 null일 수도 있어서 optional = true
+    @JoinColumn(name = "member_id")
     private Member member;
 }
