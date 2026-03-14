@@ -1,5 +1,6 @@
 package com.example.couponSystem.domain;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import jakarta.persistence.CascadeType;
@@ -13,6 +14,7 @@ import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.Builder.Default;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -47,6 +49,7 @@ public class Member {
     @Column(nullable = false, length = 30)
     private String role;
 
-    @OneToMany(cascade = CascadeType.ALL)
-    private List<Coupon> couponList;
+    @Default
+    @OneToMany(mappedBy = "member", cascade = { CascadeType.PERSIST, CascadeType.MERGE })
+    private List<Coupon> couponList = new ArrayList<>();
 }
