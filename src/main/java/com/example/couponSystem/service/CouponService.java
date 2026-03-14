@@ -1,11 +1,11 @@
 package com.example.couponSystem.service;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import com.example.couponSystem.domain.Coupon;
@@ -28,21 +28,16 @@ public class CouponService {
     public String CouponIssuance(Long userId) {
         Member user = userRepository.getReferenceById(userId);
 
-        Optional<Coupon> coupon = couponRepository.findFirstByState(CouponState.NEW);
-        if (coupon.isEmpty()) {
+        List<Coupon> picked = couponRepository.findFirstNewForUpdate(PageRequest.of(0,1));
+        if (picked.isEmpty()) {
             return "EMPTY";
         }
 
-        Coupon registedCoupon = coupon.get();
+        Coupon coupon = picked.get(0);
 
-        List<Coupon> couponList = user.getCouponList();
-        registedCoupon.setState(CouponState.ASSIGNED);
-        couponList.add(registedCoupon);
-
-        user.setCouponList(couponList);
-
-        couponRepository.save(registedCoupon);
-        userRepository.save(user);
+        coupon.setState(CouponState.ASSIGNED);
+        coupon.setMember(user);
+        couponRepository.save(coupon);
 
         return "ISSUED";
     }
