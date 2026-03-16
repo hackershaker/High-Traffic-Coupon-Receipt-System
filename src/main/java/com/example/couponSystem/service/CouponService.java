@@ -6,7 +6,9 @@ import java.util.stream.IntStream;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import com.example.couponSystem.domain.Coupon;
 import com.example.couponSystem.domain.CouponState;
@@ -45,7 +47,7 @@ public class CouponService {
     @Transactional
     public String issueCouponForUsername(String username) {
         Member user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new IllegalArgumentException("User not found: " + username));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found: " + username));
         return CouponIssuance(user.getId());
     }
 
