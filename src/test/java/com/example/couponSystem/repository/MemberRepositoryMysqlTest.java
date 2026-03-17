@@ -2,6 +2,7 @@ package com.example.couponSystem.repository;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -17,6 +18,7 @@ import com.example.couponSystem.domain.Coupon;
 import com.example.couponSystem.domain.CouponState;
 import com.example.couponSystem.domain.Member;
 
+@Tag("docker")
 @Testcontainers
 @SpringBootTest
 @Transactional
@@ -35,7 +37,7 @@ class MemberRepositoryMysqlTest {
         registry.add("spring.datasource.username", mysql::getUsername);
         registry.add("spring.datasource.password", mysql::getPassword);
         registry.add("spring.test.database.replace", () -> "NONE");
-        registry.add("spring.datasource.hikari.connection-timeout", () -> "300000"); // 5분
+        registry.add("spring.datasource.hikari.connection-timeout", () -> "300000");
         registry.add("spring.datasource.hikari.max-lifetime", () -> "600000");
         registry.add("spring.datasource.hikari.idle-timeout", () -> "300000");
         registry.add("spring.datasource.hikari.leak-detection-threshold", () -> "0");
