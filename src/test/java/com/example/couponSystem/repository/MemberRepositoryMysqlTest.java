@@ -13,6 +13,8 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.mysql.MySQLContainer;
 import org.testcontainers.utility.DockerImageName;
 
+import com.example.couponSystem.domain.Coupon;
+import com.example.couponSystem.domain.CouponState;
 import com.example.couponSystem.domain.Member;
 
 @Testcontainers
@@ -45,6 +47,9 @@ class MemberRepositoryMysqlTest {
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    private CouponRepository couponRepository;
+
     @Test
     void memberIsPersistedInMysqlContainer() {
         Member member = Member.builder()
@@ -57,5 +62,17 @@ class MemberRepositoryMysqlTest {
 
         assertThat(saved.getId()).isNotNull();
         assertThat(userRepository.findByUsername("tc-user")).isPresent();
+    }
+
+    @Test
+    void skipLockedQueryReturnsANewCoupon() {
+        Coupon coupon = new Coupon();
+        coupon.setState(CouponState.NEW);
+        couponRepository.save(coupon);
+
+        var found = couponRepository.findFirstNewForUpdateSkipLocked();
+
+        assertThat(found).isPresent();
+        assertThat(found.get().getState()).isEqualTo(CouponState.NEW);
     }
 }
