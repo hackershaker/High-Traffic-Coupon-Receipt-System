@@ -11,6 +11,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -31,6 +32,7 @@ import com.example.couponSystem.domain.Member;
 import com.example.couponSystem.repository.CouponRepository;
 import com.example.couponSystem.repository.UserRepository;
 
+@Tag("docker")
 @Testcontainers
 @SpringBootTest
 class CouponControllerTest {
@@ -147,5 +149,3 @@ class CouponControllerTest {
                 .andExpect(status().isNotFound());
     }
 }
-
-
