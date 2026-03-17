@@ -1,6 +1,7 @@
 package com.example.couponSystem.controller;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -74,8 +75,30 @@ class MemberControllerTest {
                         .accept(MediaType.APPLICATION_JSON)
                         .content(payload)
                         .with(SecurityMockMvcRequestPostProcessors.csrf()))
-                .andExpect(MockMvcResultMatchers.status().isBadRequest());
+                .andExpect(MockMvcResultMatchers.status().isBadRequest())
+                .andExpect(jsonPath("$.status").value(400))
+                .andExpect(jsonPath("$.error").value("Bad Request"))
+                .andExpect(jsonPath("$.path").value("/signup"))
+                .andExpect(jsonPath("$.message").value("이미 존재하는 아이디입니다."));
 
         assertThat(userRepository.findByUsername(username)).isPresent();
+    }
+
+    @Test
+    void signup_rejectsInvalidPayload_withValidationErrors() throws Exception {
+        String payload = "{\"username\":\" \",\"password\":\"123\"}";
+
+        mockMvc.perform(MockMvcRequestBuilders.post("/signup")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON)
+                        .content(payload)
+                        .with(SecurityMockMvcRequestPostProcessors.csrf()))
+                .andExpect(MockMvcResultMatchers.status().isBadRequest())
+                .andExpect(jsonPath("$.status").value(400))
+                .andExpect(jsonPath("$.error").value("Bad Request"))
+                .andExpect(jsonPath("$.message").value("Validation failed"))
+                .andExpect(jsonPath("$.path").value("/signup"))
+                .andExpect(jsonPath("$.fieldErrors.username").exists())
+                .andExpect(jsonPath("$.fieldErrors.password").exists());
     }
 }
