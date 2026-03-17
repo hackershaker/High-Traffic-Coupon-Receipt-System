@@ -37,8 +37,8 @@ dependencies {
 	developmentOnly 'org.springframework.boot:spring-boot-devtools'
 	runtimeOnly 'com.mysql:mysql-connector-j' 
 	
-testImplementation 'org.springframework.boot:spring-boot-starter-test'
-testImplementation 'org.springframework.boot:spring-boot-test-autoconfigure'
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+	testImplementation 'org.springframework.boot:spring-boot-test-autoconfigure'
 	testImplementation 'org.springframework.security:spring-security-test'
 	testImplementation 'org.springframework.boot:spring-boot-testcontainers'
     testImplementation 'org.testcontainers:testcontainers-mysql'
@@ -51,5 +51,17 @@ testImplementation 'org.springframework.boot:spring-boot-test-autoconfigure'
 }
 
 tasks.named('test') {
-	useJUnitPlatform()
+	useJUnitPlatform {
+		excludeTags 'docker'
+	}
+}
+
+tasks.register('dockerTest', Test) {
+	group = 'verification'
+	description = 'Runs tests that require Docker/Testcontainers.'
+	testClassesDirs = sourceSets.test.output.classesDirs
+	classpath = sourceSets.test.runtimeClasspath
+	useJUnitPlatform {
+		includeTags 'docker'
+	}
 }
