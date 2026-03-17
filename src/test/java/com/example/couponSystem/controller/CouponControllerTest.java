@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -73,7 +74,7 @@ class CouponControllerTest {
     }
 
     @Test
-    void issueForCurrentUser_usesAuthenticatedPrincipalAndAssignsCoupon() throws Exception {
+    void issueForCurrentUser_returnsIssuedJsonAndAssignsCoupon() throws Exception {
         Member member = Member.builder()
                 .username("coupon-user")
                 .passwordHash("hash")
@@ -88,7 +89,8 @@ class CouponControllerTest {
         mockMvc.perform(post("/coupon/me")
                         .with(user("coupon-user").roles("USER"))
                         .with(csrf()))
-                .andExpect(status().isOk());
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.result").value("ISSUED"));
 
         List<Coupon> assignedCoupons = couponRepository.findAll().stream()
                 .filter(each -> each.getState() == CouponState.ASSIGNED)
@@ -97,6 +99,22 @@ class CouponControllerTest {
         assertThat(assignedCoupons).hasSize(1);
         assertThat(assignedCoupons.get(0).getMember()).isNotNull();
         assertThat(assignedCoupons.get(0).getMember().getId()).isEqualTo(savedMember.getId());
+    }
+
+    @Test
+    void issueForCurrentUser_returnsEmptyJson_whenNoCouponIsAvailable() throws Exception {
+        Member member = Member.builder()
+                .username("coupon-user")
+                .passwordHash("hash")
+                .role("ROLE_USER")
+                .build();
+        userRepository.save(member);
+
+        mockMvc.perform(post("/coupon/me")
+                        .with(user("coupon-user").roles("USER"))
+                        .with(csrf()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.result").value("EMPTY"));
     }
 
     @Test
@@ -112,6 +130,14 @@ class CouponControllerTest {
     }
 
     @Test
+    void issueForCurrentUser_redirectsToLogin_whenUnauthenticated() throws Exception {
+        mockMvc.perform(post("/coupon/me")
+                        .with(csrf()))
+                .andExpect(status().isFound())
+                .andExpect(header().string("Location", org.hamcrest.Matchers.containsString("/login")));
+    }
+
+    @Test
     void legacyCouponEndpoint_isNotExposed() throws Exception {
         mockMvc.perform(post("/coupon")
                         .contentType("application/json")
@@ -121,4 +147,5 @@ class CouponControllerTest {
                 .andExpect(status().isNotFound());
     }
 }
+
 
