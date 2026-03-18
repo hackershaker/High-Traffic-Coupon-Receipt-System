@@ -1,7 +1,5 @@
 package com.example.couponSystem.security;
 
-import java.util.stream.IntStream;
-
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
@@ -22,15 +20,41 @@ public class DataInitializer implements CommandLineRunner {
     private final PasswordEncoder passwordEncoder;
     private final CouponService couponService;
     private final TestDataProperties testDataProperties;
+    private final LoadTestUserSeedingService loadTestUserSeedingService;
+    private final TestDataSeedingMetricsRecorder metricsRecorder;
 
     @Override
     public void run(String... args) {
+        long totalStartedAt = System.nanoTime();
+        long bootstrapStartedAt = System.nanoTime();
         ensureBootstrapUser();
+        long bootstrapMillis = elapsedMillis(bootstrapStartedAt);
+
+        long couponSeedMillis = 0;
+        LoadTestUserSeedResult userSeedResult = LoadTestUserSeedResult.empty();
 
         if (testDataProperties.isEnabled()) {
+            long couponSeedStartedAt = System.nanoTime();
             couponService.ensureTestCoupons(testDataProperties.getCouponCount());
-            createLoadTestUsers();
+            couponSeedMillis = elapsedMillis(couponSeedStartedAt);
+
+            String passwordHash = passwordEncoder.encode(testDataProperties.getUserPassword());
+            userSeedResult = loadTestUserSeedingService.seedUsers(testDataProperties, passwordHash);
         }
+
+        metricsRecorder.record(new TestDataSeedingMetrics(
+                testDataProperties.getSeedMode().name(),
+                testDataProperties.getCouponCount(),
+                testDataProperties.getUserCount(),
+                elapsedMillis(totalStartedAt),
+                bootstrapMillis,
+                couponSeedMillis,
+                userSeedResult.totalMillis(),
+                userSeedResult.existingLookupMillis(),
+                userSeedResult.insertMillis(),
+                userSeedResult.existingLookupCallCount(),
+                userSeedResult.existingUserCount(),
+                userSeedResult.insertedUserCount()));
     }
 
     private void ensureBootstrapUser() {
@@ -47,16 +71,7 @@ public class DataInitializer implements CommandLineRunner {
         userRepository.save(user);
     }
 
-    private void createLoadTestUsers() {
-        String passwordHash = passwordEncoder.encode(testDataProperties.getUserPassword());
-        IntStream.rangeClosed(1, testDataProperties.getUserCount())
-                .mapToObj(testDataProperties::usernameForIndex)
-                .filter(username -> !userRepository.existsByUsername(username))
-                .map(username -> Member.builder()
-                        .username(username)
-                        .passwordHash(passwordHash)
-                        .role("ROLE_USER")
-                        .build())
-                .forEach(userRepository::save);
+    private long elapsedMillis(long startedAt) {
+        return (System.nanoTime() - startedAt) / 1_000_000;
     }
 }
