@@ -25,6 +25,18 @@ public class TestDataProperties {
     private String userPassword = "loadtest";
     /** Prefix used to generate the username for each generated account. */
     private String userPrefix = "load-test-user-";
+    /** Selects the test user seeding strategy (baseline or optimized). */
+    private TestDataSeedMode seedMode = TestDataSeedMode.OPTIMIZED;
+    /** Batch size used by the optimized user seeding path. */
+    private int userInsertBatchSize = 500;
+    /** Default benchmark scenario (small) user count. */
+    private int benchmarkSmallUserCount = 1000;
+    /** Default benchmark scenario (small) coupon count. */
+    private int benchmarkSmallCouponCount = 1000;
+    /** Default benchmark scenario (large) user count. */
+    private int benchmarkLargeUserCount = 10000;
+    /** Default benchmark scenario (large) coupon count. */
+    private int benchmarkLargeCouponCount = 10000;
 
     public String usernameForIndex(int index) {
         return userPrefix + index;
