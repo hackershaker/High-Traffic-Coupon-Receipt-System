@@ -30,6 +30,8 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-webmvc'
 	implementation 'org.springframework.boot:spring-boot-starter-validation'
 	implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
+	implementation 'org.springframework.boot:spring-boot-starter-actuator'
+	runtimeOnly 'io.micrometer:micrometer-registry-prometheus'
 
 	compileOnly 'org.projectlombok:lombok'
 	annotationProcessor 'org.projectlombok:lombok'
@@ -52,7 +54,7 @@ dependencies {
 
 tasks.named('test') {
 	useJUnitPlatform {
-		excludeTags 'docker'
+		excludeTags 'docker', 'benchmark'
 	}
 }
 
@@ -63,5 +65,27 @@ tasks.register('dockerTest', Test) {
 	classpath = sourceSets.test.runtimeClasspath
 	useJUnitPlatform {
 		includeTags 'docker'
+		excludeTags 'benchmark'
+	}
+}
+
+tasks.register('benchmarkTest', Test) {
+	group = 'verification'
+	description = 'Runs benchmark tests without Docker.'
+	testClassesDirs = sourceSets.test.output.classesDirs
+	classpath = sourceSets.test.runtimeClasspath
+	useJUnitPlatform {
+		includeTags 'benchmark'
+		excludeTags 'docker'
+	}
+}
+
+tasks.register('dockerBenchmarkTest', Test) {
+	group = 'verification'
+	description = 'Runs Docker-backed startup benchmark tests.'
+	testClassesDirs = sourceSets.test.output.classesDirs
+	classpath = sourceSets.test.runtimeClasspath
+	useJUnitPlatform {
+		includeTags 'benchmark-docker'
 	}
 }
