@@ -31,11 +31,13 @@ public class SecurityConfig {
                 .authenticationProvider(authenticationProvider)
                 .authorizeHttpRequests(authorize -> authorize
                         .dispatcherTypeMatchers(DispatcherType.FORWARD, DispatcherType.ERROR).permitAll()
-                        .requestMatchers("/login", "/error", "/css/**", "/signup").permitAll()
+                        .requestMatchers("/login", "/error", "/css/**", "/signup",
+                                "/actuator/health", "/actuator/prometheus").permitAll()
                         .anyRequest().authenticated())
                 .formLogin(form -> form
                         .loginProcessingUrl("/login")
-                        .defaultSuccessUrl("/", true)
+                        .defaultSuccessUrl("/", 
+                        true)
                         .permitAll())
                 .logout(logout -> logout
                         .logoutUrl("/logout")
