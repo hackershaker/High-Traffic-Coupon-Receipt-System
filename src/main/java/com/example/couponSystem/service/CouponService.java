@@ -1,6 +1,7 @@
 package com.example.couponSystem.service;
 
 import java.util.List;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -13,9 +14,11 @@ import org.springframework.web.server.ResponseStatusException;
 import com.example.couponSystem.domain.Coupon;
 import com.example.couponSystem.domain.CouponState;
 import com.example.couponSystem.domain.Member;
+import com.example.couponSystem.metrics.CouponIssueMetricsRecorder;
 import com.example.couponSystem.repository.CouponRepository;
 import com.example.couponSystem.repository.UserRepository;
 
+import io.micrometer.core.instrument.Timer;
 import jakarta.transaction.Transactional;
 
 @Service
@@ -25,30 +28,24 @@ public class CouponService {
     private CouponRepository couponRepository;
     @Autowired
     private UserRepository userRepository;
+    @Autowired
+    private CouponIssueMetricsRecorder couponIssueMetricsRecorder;
 
     @Transactional
     public String CouponIssuance(Long userId) {
-        Member user = userRepository.getReferenceById(userId);
-
-        List<Coupon> picked = couponRepository.findFirstNewForUpdate(PageRequest.of(0,1));
-        if (picked.isEmpty()) {
-            return "EMPTY";
-        }
-
-        Coupon coupon = picked.get(0);
-
-        coupon.setState(CouponState.ASSIGNED);
-        coupon.setMember(user);
-        couponRepository.save(coupon);
-
-        return "ISSUED";
+        return issueWithMetrics(() -> {
+            Member user = userRepository.getReferenceById(userId);
+            return issueCouponToMember(user);
+        });
     }
 
     @Transactional
     public String issueCouponForUsername(String username) {
-        Member user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found: " + username));
-        return CouponIssuance(user.getId());
+        return issueWithMetrics(() -> {
+            Member user = userRepository.findByUsername(username)
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found: " + username));
+            return issueCouponToMember(user);
+        });
     }
 
     @Transactional
@@ -73,5 +70,33 @@ public class CouponService {
                 .collect(Collectors.toList());
 
         couponRepository.saveAll(coupons);
+    }
+
+    private String issueCouponToMember(Member user) {
+        List<Coupon> picked = couponRepository.findFirstNewForUpdate(PageRequest.of(0, 1));
+        if (picked.isEmpty()) {
+            return "EMPTY";
+        }
+
+        Coupon coupon = picked.get(0);
+        coupon.setState(CouponState.ASSIGNED);
+        coupon.setMember(user);
+        couponRepository.save(coupon);
+        return "ISSUED";
+    }
+
+    private String issueWithMetrics(Supplier<String> issueAction) {
+        Timer.Sample sample = couponIssueMetricsRecorder.startAttempt();
+        try {
+            String result = issueAction.get();
+            couponIssueMetricsRecorder.recordResult(result);
+            return result;
+        } catch (RuntimeException exception) {
+            couponIssueMetricsRecorder.recordResult("ERROR");
+            couponIssueMetricsRecorder.recordException(exception);
+            throw exception;
+        } finally {
+            couponIssueMetricsRecorder.stopAttempt(sample);
+        }
     }
 }
