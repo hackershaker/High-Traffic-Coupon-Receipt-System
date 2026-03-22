@@ -1,6 +1,5 @@
 package com.example.couponSystem.controller;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -14,8 +13,11 @@ import com.example.couponSystem.service.CouponService;
 @RestController
 public class CouponController {
 
-    @Autowired
-    private CouponService couponService;
+    private final CouponService couponService;
+
+    public CouponController(CouponService couponService) {
+        this.couponService = couponService;
+    }
 
     @PostMapping("/coupon/me")
     public ResponseEntity<CouponResponse> registerForCurrentUser(@AuthenticationPrincipal UserDetails userDetails) {

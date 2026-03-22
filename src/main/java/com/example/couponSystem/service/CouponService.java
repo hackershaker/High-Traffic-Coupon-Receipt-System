@@ -5,7 +5,6 @@ import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -24,15 +23,21 @@ import jakarta.transaction.Transactional;
 @Service
 public class CouponService {
 
-    @Autowired
-    private CouponRepository couponRepository;
-    @Autowired
-    private UserRepository userRepository;
-    @Autowired
-    private CouponIssueMetricsRecorder couponIssueMetricsRecorder;
+    private final CouponRepository couponRepository;
+    private final UserRepository userRepository;
+    private final CouponIssueMetricsRecorder couponIssueMetricsRecorder;
+
+    public CouponService(
+            CouponRepository couponRepository,
+            UserRepository userRepository,
+            CouponIssueMetricsRecorder couponIssueMetricsRecorder) {
+        this.couponRepository = couponRepository;
+        this.userRepository = userRepository;
+        this.couponIssueMetricsRecorder = couponIssueMetricsRecorder;
+    }
 
     @Transactional
-    public String CouponIssuance(Long userId) {
+    public String issueCouponForUserId(Long userId) {
         return issueWithMetrics(() -> {
             Member user = userRepository.getReferenceById(userId);
             return issueCouponToMember(user);
