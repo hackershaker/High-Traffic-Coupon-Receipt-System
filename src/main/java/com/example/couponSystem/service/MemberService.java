@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import com.example.couponSystem.domain.Member;
+import com.example.couponSystem.domain.MemberStatus;
 import com.example.couponSystem.dto.MemberRegisterRequest;
 import com.example.couponSystem.repository.UserRepository;
 
@@ -27,6 +28,7 @@ public class MemberService {
                 .username(request.getUsername())
                 .passwordHash(passwordEncoder.encode(request.getPassword()))
                 .role("ROLE_USER")
+                .status(MemberStatus.ACTIVE)
                 .build();
 
         userRepository.save(member);

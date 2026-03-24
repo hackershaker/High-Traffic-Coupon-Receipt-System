@@ -6,6 +6,7 @@ import org.springframework.stereotype.Component;
 
 import com.example.couponSystem.config.TestDataProperties;
 import com.example.couponSystem.domain.Member;
+import com.example.couponSystem.domain.MemberStatus;
 import com.example.couponSystem.repository.UserRepository;
 import com.example.couponSystem.service.CouponService;
 
@@ -66,6 +67,7 @@ public class DataInitializer implements CommandLineRunner {
                 .username(BOOTSTRAP_USERNAME)
                 .passwordHash(passwordEncoder.encode("change-me"))
                 .role("ROLE_USER")
+                .status(MemberStatus.ACTIVE)
                 .build();
 
         userRepository.save(user);

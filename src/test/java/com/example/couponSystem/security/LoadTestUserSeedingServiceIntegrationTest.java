@@ -9,6 +9,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 
 import com.example.couponSystem.config.TestDataProperties;
 import com.example.couponSystem.config.TestDataSeedMode;
+import com.example.couponSystem.domain.MemberStatus;
 import com.example.couponSystem.repository.UserRepository;
 
 @SpringBootTest
@@ -37,5 +38,7 @@ class LoadTestUserSeedingServiceIntegrationTest {
         assertThat(first.insertedUserCount()).isEqualTo(120);
         assertThat(second.insertedUserCount()).isEqualTo(0);
         assertThat(userRepository.count()).isEqualTo(120);
+        assertThat(userRepository.findByUsername("seed-user-1").orElseThrow().effectiveStatus())
+                .isEqualTo(MemberStatus.ACTIVE);
     }
 }

@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import com.example.couponSystem.domain.MemberStatus;
 import com.example.couponSystem.repository.CouponRepository;
 import com.example.couponSystem.repository.UserRepository;
 
@@ -32,7 +33,11 @@ class DataInitializerTest {
         assertThat(couponRepository.count()).isEqualTo(7);
         assertThat(userRepository.count()).isGreaterThanOrEqualTo(4); // default user + 3 load-test accounts
         assertThat(userRepository.findByUsername("seed-user-1")).isPresent();
+        assertThat(userRepository.findByUsername("seed-user-1").orElseThrow().effectiveStatus())
+                .isEqualTo(MemberStatus.ACTIVE);
         assertThat(userRepository.existsByUsername("user")).isTrue();
+        assertThat(userRepository.findByUsername("user").orElseThrow().effectiveStatus())
+                .isEqualTo(MemberStatus.ACTIVE);
 
         dataInitializer.run();
         assertThat(couponRepository.count()).isEqualTo(7);

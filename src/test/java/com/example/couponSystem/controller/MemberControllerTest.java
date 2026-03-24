@@ -19,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.context.WebApplicationContext;
 
 import com.example.couponSystem.domain.Member;
+import com.example.couponSystem.domain.MemberStatus;
 import com.example.couponSystem.repository.UserRepository;
 
 @SpringBootTest
@@ -57,6 +58,7 @@ class MemberControllerTest {
         Member saved = userRepository.findByUsername(username).orElseThrow();
         assertThat(saved.getUsername()).isEqualTo(username);
         assertThat(passwordEncoder.matches("Secret!23", saved.getPasswordHash())).isTrue();
+        assertThat(saved.effectiveStatus()).isEqualTo(MemberStatus.ACTIVE);
     }
 
     @Test

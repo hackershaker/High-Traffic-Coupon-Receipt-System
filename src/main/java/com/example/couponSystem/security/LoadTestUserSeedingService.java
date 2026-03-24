@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import com.example.couponSystem.config.TestDataProperties;
 import com.example.couponSystem.config.TestDataSeedMode;
 import com.example.couponSystem.domain.Member;
+import com.example.couponSystem.domain.MemberStatus;
 import com.example.couponSystem.repository.UserRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -99,6 +100,7 @@ public class LoadTestUserSeedingService {
                 .username(username)
                 .passwordHash(passwordHash)
                 .role("ROLE_USER")
+                .status(MemberStatus.ACTIVE)
                 .build();
     }
 
@@ -106,4 +108,3 @@ public class LoadTestUserSeedingService {
         return (System.nanoTime() - startedAt) / 1_000_000;
     }
 }
-
