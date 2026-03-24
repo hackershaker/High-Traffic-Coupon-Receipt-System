@@ -6,10 +6,13 @@ import java.util.List;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
 import lombok.AllArgsConstructor;
@@ -49,7 +52,23 @@ public class Member {
     @Column(nullable = false, length = 30)
     private String role;
 
+    @Builder.Default
+    @Enumerated(EnumType.STRING)
+    @Column(length = 20)
+    private MemberStatus status = MemberStatus.ACTIVE;
+
     @Default
     @OneToMany(mappedBy = "member", cascade = { CascadeType.PERSIST, CascadeType.MERGE })
     private List<Coupon> couponList = new ArrayList<>();
+
+    @PrePersist
+    void applyDefaultStatus() {
+        if (status == null) {
+            status = MemberStatus.ACTIVE;
+        }
+    }
+
+    public MemberStatus effectiveStatus() {
+        return status == null ? MemberStatus.ACTIVE : status;
+    }
 }
