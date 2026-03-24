@@ -159,7 +159,7 @@ class CouponMysqlLockingIntegrationTest {
             }
             assertThat(deadlockCount).isGreaterThanOrEqualTo(1);
 
-            String issuanceResult = couponService.CouponIssuance(member.getId());
+            String issuanceResult = couponService.issueCouponForUserId(member.getId());
             assertThat(issuanceResult).isEqualTo("ISSUED");
 
             long assignedCount = couponRepository.findAll().stream()
@@ -249,3 +249,4 @@ class CouponMysqlLockingIntegrationTest {
         return couponRepository.save(coupon);
     }
 }
+

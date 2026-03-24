@@ -58,8 +58,8 @@ class CouponIssueMetricsIntegrationTest {
         double emptyBefore = taggedCounterValue("coupon.issue.result.count", "result", "EMPTY");
         long latencyCountBefore = timerCount("coupon.issue.latency");
 
-        assertThat(couponService.CouponIssuance(member.getId())).isEqualTo("ISSUED");
-        assertThat(couponService.CouponIssuance(member.getId())).isEqualTo("EMPTY");
+        assertThat(couponService.issueCouponForUserId(member.getId())).isEqualTo("ISSUED");
+        assertThat(couponService.issueCouponForUserId(member.getId())).isEqualTo("EMPTY");
 
         assertThat(counterValue("coupon.issue.request.count")).isEqualTo(requestBefore + 2.0);
         assertThat(taggedCounterValue("coupon.issue.result.count", "result", "ISSUED"))
@@ -99,3 +99,4 @@ class CouponIssueMetricsIntegrationTest {
         return timer == null ? 0L : timer.count();
     }
 }
+

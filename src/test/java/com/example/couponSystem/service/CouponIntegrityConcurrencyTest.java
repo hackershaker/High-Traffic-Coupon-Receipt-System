@@ -72,7 +72,7 @@ class CouponIntegrityConcurrencyTest {
             executor.submit(() -> {
                 try {
                     start.await();
-                    String result = couponService.CouponIssuance(member.getId());
+                    String result = couponService.issueCouponForUserId(member.getId());
                     if ("ISSUED".equals(result)) {
                         issuedCount.incrementAndGet();
                     } else if ("EMPTY".equals(result)) {
@@ -133,3 +133,4 @@ class CouponIntegrityConcurrencyTest {
         assertThat(membersHoldingMultipleAssignedCoupons).isZero();
     }
 }
+
