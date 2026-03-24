@@ -7,6 +7,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import com.example.couponSystem.domain.Member;
+import com.example.couponSystem.domain.MemberStatus;
 import com.example.couponSystem.repository.UserRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -22,7 +23,10 @@ public class CustomUserDetailsService implements UserDetailsService {
         Member user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found: " + username));
 
+        boolean disabled = user.effectiveStatus() == MemberStatus.DEACTIVATED;
+
         return User.withUsername(user.getUsername()).password(user.getPasswordHash()).authorities(user.getRole())
+                .disabled(disabled)
                 .build();
     }
 
